@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysqldb-server
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD : 123456
+      MYSQL_DATABASE: mymarket
+    restart: always  # 컨테이너가 중단되면 항상 다시 시작
+
+networks:
+  preorder_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
