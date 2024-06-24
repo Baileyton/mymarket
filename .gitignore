@@ -6,8 +6,7 @@ build/
 !**/src/test/**/build/
 
 application.properties
-mariadb.env
-
+.env
 
 ### STS ###
 .apt_generated
