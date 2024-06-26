@@ -1,7 +1,9 @@
 package com.mymarket.service;
 
 import com.mymarket.dto.LoginRequestDto;
+import com.mymarket.dto.PasswordUpdateRequestDto;
 import com.mymarket.dto.SignupRequestDto;
+import com.mymarket.dto.UpdateProfileRequestDto;
 import com.mymarket.entity.User;
 import com.mymarket.entity.UserRoleEnum;
 import com.mymarket.repository.UserRepository;
@@ -34,20 +36,26 @@ public class UserService {
                 .phone(encodedPhone)
                 .address(encodedAddress)
                 .created_at(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .modified_at(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .role(UserRoleEnum.USER) // 기본 역할 설정
                 .build();
 
         return userRepository.save(user);
     }
 
-    public User login(LoginRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + requestDto.getEmail()));
-
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid password");
+    public void updatePassword(User user, PasswordUpdateRequestDto requestDto) {
+        if (!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
         }
 
-        return user;
+        String newEncodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
+        user.updatePassword(newEncodedPassword);
+        userRepository.save(user);
+    }
+
+    public void updateProfile(User user, UpdateProfileRequestDto requestDto) {
+        user.updateAddress(passwordEncoder.encode(requestDto.getNewAddress()));
+        user.updatePhone(passwordEncoder.encode(requestDto.getNewPhone()));
+        userRepository.save(user);
     }
 }

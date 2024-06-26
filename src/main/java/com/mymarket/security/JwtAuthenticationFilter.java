@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
         response.setStatus(401);
         Map<String, String> errorDetails = new HashMap<>();
-        errorDetails.put("error", "Authentication failed");
+        errorDetails.put("error", "잘못된 비밀번호 입니다.");
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
