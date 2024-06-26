@@ -1,5 +1,6 @@
 package com.mymarket.contoller;
 
+import com.mymarket.dto.CartQuantityDto;
 import com.mymarket.dto.CartRequestDto;
 import com.mymarket.entity.Cart;
 import com.mymarket.security.UserDetailsImpl;
@@ -36,5 +37,18 @@ public class CartController {
         Long userId = userDetails.getUser().getId();
         List<Cart> cartList = cartService.getCartListByUserId(userId);
         return ResponseEntity.ok(cartList);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCartProduct(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                               @PathVariable Long id,
+                                               @Valid @RequestBody CartQuantityDto requestDto) {
+        try {
+            Long userId = userDetails.getUser().getId();
+            Cart updatedCart = cartService.updateCartProduct(userId, id, requestDto);
+            return ResponseEntity.ok(updatedCart);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

@@ -28,4 +28,8 @@ public class Cart {
     private Integer quantity;
 
     private String createdAt;
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
 }

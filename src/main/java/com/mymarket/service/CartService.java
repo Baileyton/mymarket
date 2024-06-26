@@ -1,6 +1,7 @@
 package com.mymarket.service;
 
 
+import com.mymarket.dto.CartQuantityDto;
 import com.mymarket.dto.CartRequestDto;
 import com.mymarket.entity.Cart;
 import com.mymarket.repository.CartRepository;
@@ -37,4 +38,13 @@ public class CartService {
     public List<Cart> getCartListByUserId(long userId) {
         return cartRepository.findByUserId(userId);
     }
+
+    public Cart updateCartProduct(Long userId, Long cartId, CartQuantityDto requestDto) {
+        Cart cart = cartRepository.findByIdAndUserId(cartId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
+        cart.setQuantity(requestDto.getQuantity());
+        return cartRepository.save(cart);
+    }
+
+
 }
