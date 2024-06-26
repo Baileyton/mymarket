@@ -1,6 +1,5 @@
 package com.mymarket.service;
 
-import com.mymarket.dto.LoginRequestDto;
 import com.mymarket.dto.PasswordUpdateRequestDto;
 import com.mymarket.dto.SignupRequestDto;
 import com.mymarket.dto.UpdateProfileRequestDto;
