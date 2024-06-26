@@ -1,6 +1,7 @@
 package com.mymarket.contoller;
 
 
+import com.mymarket.dto.ProductResponseDto;
 import com.mymarket.entity.Product;
 import com.mymarket.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,8 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    public ResponseEntity<List<ProductResponseDto>> getProducts() {
+        List<ProductResponseDto> products = productService.getProducts();
         return ResponseEntity.ok(products);
     }
 
