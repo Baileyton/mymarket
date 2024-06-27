@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,4 +35,10 @@ public class Order {
 
     @Column(name = "modified_at")
     private String modifiedAt;
+
+    // 상태 변경 메서드
+    public void updateStatus(String newStatus) {
+        this.status = newStatus;
+        this.modifiedAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
 }
