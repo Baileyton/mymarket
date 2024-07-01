@@ -1,2 +1,6 @@
 rootProject.name = 'mymarket'
-include ''
+
+include 'config'
+include 'order'
+include 'product'
+include 'user'
