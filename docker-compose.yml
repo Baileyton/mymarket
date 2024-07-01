@@ -1,13 +1,20 @@
 version: '3.8'
 services:
+  myapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_started
+    ports:
+      - "8080:8080"
   db:
     image: mysql:8.0
     container_name: mysqldb-server
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_USER : ${MYSQL_ROOT_USER}
-      MYSQL_ROOT_PASSWORD : ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    volumes:
-      - ./data/:/var/lib/mysql
+      MYSQL_ROOT_USER : root
+      MYSQL_ROOT_PASSWORD : 123456
+      MYSQL_DATABASE: mymarket
