@@ -15,13 +15,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
     @PostMapping("/signup")
@@ -64,5 +63,11 @@ public class UserController {
                                                 @Valid @RequestBody UpdateProfileRequestDto requestDto) {
         userService.updateProfile(userDetails.getUser(), requestDto);
         return ResponseEntity.ok("주소, 휴대폰 번호 업데이트 성공했습니다.");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        // 클라이언트 측에서 JWT 토큰을 삭제하도록 요청
+        return ResponseEntity.ok("Successfully logged out");
     }
 }
