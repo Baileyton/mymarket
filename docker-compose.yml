@@ -1,20 +1,31 @@
 version: '3.8'
 services:
-  myapp:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_started
-    ports:
-      - "8080:8080"
   db:
     image: mysql:8.0
     container_name: mysqldb-server
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_USER : root
-      MYSQL_ROOT_PASSWORD : 123456
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: mymarket
+    command: # 명령어 실행
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./data/:/var/lib/mysql # -v 옵션 (디렉토리 마운트 설정)
+
+#  myapp:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    depends_on:
+#      - db
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mymarket
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: 123456
+#    volumes:
+#      - ./logs:/var/logs/myapp
