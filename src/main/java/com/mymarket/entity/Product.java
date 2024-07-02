@@ -1,6 +1,8 @@
 package com.mymarket.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,6 +11,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "products")
 public class Product {
     @Id
