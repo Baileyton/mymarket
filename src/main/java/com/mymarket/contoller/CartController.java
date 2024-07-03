@@ -39,13 +39,13 @@ public class CartController {
         return ResponseEntity.ok(cartList);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{productId}")
     public ResponseEntity<?> updateCartProduct(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                               @PathVariable Long id,
+                                               @PathVariable("productId") Long productId,
                                                @Valid @RequestBody CartQuantityDto requestDto) {
         try {
             Long userId = userDetails.getUser().getId();
-            Cart updatedCart = cartService.updateCartProduct(userId, id, requestDto);
+            Cart updatedCart = cartService.updateCartProduct(userId, productId, requestDto);
             return ResponseEntity.ok(updatedCart);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

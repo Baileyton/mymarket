@@ -39,8 +39,8 @@ public class CartService {
         return cartRepository.findByUserId(userId);
     }
 
-    public Cart updateCartProduct(Long userId, Long cartId, CartQuantityDto requestDto) {
-        Cart cart = cartRepository.findByIdAndUserId(cartId, userId)
+    public Cart updateCartProduct(Long userId, Long productId, CartQuantityDto requestDto) {
+        Cart cart = cartRepository.findByIdAndUserId(userId, productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
         cart.setQuantity(requestDto.getQuantity());
         return cartRepository.save(cart);
