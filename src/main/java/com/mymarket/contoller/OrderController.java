@@ -1,6 +1,7 @@
 package com.mymarket.contoller;
 
 import com.mymarket.dto.OrderRequestDto;
+import com.mymarket.dto.OrderResponseDto;
 import com.mymarket.entity.Cart;
 import com.mymarket.entity.Order;
 import com.mymarket.security.UserDetailsImpl;
@@ -25,8 +26,8 @@ public class OrderController {
     public ResponseEntity<?> order(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                           @Valid @RequestBody OrderRequestDto requestDto) {
         Long userId = userDetails.getUser().getId(); // 인증된 사용자의 userId 가져오기
-        Order order = orderService.order(userId, requestDto);
-        return ResponseEntity.ok(order);
+        OrderResponseDto orderResponseDto = orderService.createOrder(userId, requestDto);
+        return ResponseEntity.ok(orderResponseDto);
     }
 
     @GetMapping("/orders")
@@ -36,8 +37,8 @@ public class OrderController {
         return ResponseEntity.ok(orderList);
     }
 
-    @GetMapping("/order/{id}")
-    public ResponseEntity<?> getOrderById(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id) {
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<?> getOrderById(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("orderId") Long id) {
         Long userId = userDetails.getUser().getId();
         Order order = orderService.getOrderById(userId, id);
         if (order == null) {

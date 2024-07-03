@@ -1,9 +1,13 @@
 package com.mymarket.service;
 
 
+import com.mymarket.dto.OrderProductResponseDto;
 import com.mymarket.dto.OrderRequestDto;
+import com.mymarket.dto.OrderResponseDto;
 import com.mymarket.entity.Order;
+import com.mymarket.entity.OrderProduct;
 import com.mymarket.repository.OrderRepository;
+import com.mymarket.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,14 +17,16 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
-    public Order order(Long userId, OrderRequestDto requestDto) {
+    public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
         // 주문 생성
         Order order = Order.builder()
                 .userId(userId)
@@ -29,7 +35,24 @@ public class OrderService {
                 .modifiedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
 
-        return orderRepository.save(order);
+        List<OrderProduct> orderProducts = requestDto.getProductInfo().stream()
+                .map(productDto -> OrderProduct.builder()
+                        .order(order)
+                        .productId(productDto.getProductId())
+                        .price(productRepository.findById(productDto.getProductId()).orElseThrow(() ->
+                                new IllegalArgumentException("Product not found")).getPrice())
+                        .quantity(productDto.getQuantity())
+                        .build())
+                .collect(Collectors.toList());
+
+        order.setOrderProducts(orderProducts);
+        orderRepository.save(order);
+
+        List<OrderProductResponseDto> orderProductResponseDtos = orderProducts.stream()
+                .map(op -> new OrderProductResponseDto(op.getProductId(), op.getQuantity()))
+                .toList();
+
+        return new OrderResponseDto(order.getId(), order.getUserId(), order.getStatus(), order.getCreatedAt(), order.getModifiedAt(), orderProductResponseDtos);
     }
 
     @Scheduled(cron = "0 0 1 * * ?") // 매일 새벽 1시에 실행
