@@ -9,7 +9,7 @@ import com.mymarket.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -21,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional // 메서드 수준에서 트랜잭션 적용
     public User signUp(SignupRequestDto requestDto) {
         if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 가입 되어 있는 이메일 입니다.");
@@ -35,14 +36,15 @@ public class UserService {
                 .password(encodedPassword)
                 .phone(encodedPhone)
                 .address(encodedAddress)
-                .created_at(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .modified_at(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .created_at(getCurrentTimestamp())
+                .modified_at(getCurrentTimestamp())
                 .role(UserRoleEnum.USER) // 기본 역할 설정
                 .build();
 
         return userRepository.save(user);
     }
 
+    @Transactional(readOnly = true) // 읽기 전용 트랜잭션
     public User getDetail(long id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {
@@ -51,6 +53,8 @@ public class UserService {
             throw new IllegalArgumentException("회원을 조회 할 수 없습니다.");
         }
     }
+
+    @Transactional
     public void updatePassword(User user, PasswordUpdateRequestDto requestDto) {
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
@@ -61,9 +65,14 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void updateProfile(User user, UpdateProfileRequestDto requestDto) {
         user.updateAddress(passwordEncoder.encode(requestDto.getNewAddress()));
         user.updatePhone(passwordEncoder.encode(requestDto.getNewPhone()));
         userRepository.save(user);
+    }
+
+    private String getCurrentTimestamp() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }

@@ -5,12 +5,10 @@ import com.mymarket.dto.ProductResponseDto;
 import com.mymarket.entity.Product;
 import com.mymarket.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +19,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public List<ProductResponseDto> getProducts() {
         List<Product> products = productRepository.findAll();
         return products.stream()
@@ -28,10 +27,12 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
 
+    @Transactional
     public Product createProduct(ProductRequestDto requestDto) {
         Product product = Product.builder()
                 .name(requestDto.getName())

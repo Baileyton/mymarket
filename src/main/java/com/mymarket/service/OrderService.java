@@ -11,7 +11,7 @@ import com.mymarket.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -26,6 +26,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
+    @Transactional
     public OrderResponseDto createOrder(Long userId, OrderRequestDto requestDto) {
         // 주문 생성
         Order order = Order.builder()
@@ -65,6 +66,7 @@ public class OrderService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Order getOrderStatus(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
@@ -86,16 +88,18 @@ public class OrderService {
         }
     }
 
-
+    @Transactional(readOnly = true)
     public List<Order> getOrderListByUserId(long userId) {
         return orderRepository.findByUserId(userId);
     }
 
+    @Transactional(readOnly = true)
     public Order getOrderById(Long userId, Long orderId) {
         Optional<Order> orderOptional = orderRepository.findByIdAndUserId(orderId, userId);
         return orderOptional.orElse(null);
     }
 
+    @Transactional
     public boolean deleteOrderById(Long userId, Long orderId) {
         Optional<Order> orderOptional = orderRepository.findByIdAndUserId(orderId, userId);
         if (orderOptional.isPresent()) {
