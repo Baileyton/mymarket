@@ -33,22 +33,19 @@ public class OrderController {
     @GetMapping("/orders")
     public ResponseEntity<?> getOrders(@AuthenticationPrincipal UserDetailsImpl userDetails){
         Long userId = userDetails.getUser().getId();
-        List<Order> orderList = orderService.getOrderListByUserId(userId);
-        return ResponseEntity.ok(orderList);
+        List<OrderResponseDto> orderResponseDtos = orderService.getOrdersByUserId(userId);
+        return ResponseEntity.ok(orderResponseDtos);
     }
 
     @GetMapping("/order/{orderId}")
     public ResponseEntity<?> getOrderById(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("orderId") Long id) {
         Long userId = userDetails.getUser().getId();
-        Order order = orderService.getOrderById(userId, id);
-        if (order == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Order not found");
-        }
-        return ResponseEntity.ok(order);
+        OrderResponseDto orderResponseDto = orderService.getOrderById(userId, id);
+        return ResponseEntity.ok(orderResponseDto);
     }
 
-    @DeleteMapping("/order/{id}")
-    public ResponseEntity<?> deleteOrderById(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long id) {
+    @DeleteMapping("/order/{orderId}")
+    public ResponseEntity<?> deleteOrderById(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("orderId") Long id) {
         Long userId = userDetails.getUser().getId();
         boolean deleted = orderService.deleteOrderById(userId, id);
         if (!deleted) {

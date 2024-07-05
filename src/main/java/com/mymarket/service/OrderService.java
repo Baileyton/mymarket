@@ -89,14 +89,26 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<Order> getOrderListByUserId(long userId) {
-        return orderRepository.findByUserId(userId);
+    public List<OrderResponseDto> getOrdersByUserId(Long userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        return orders.stream().map(order -> {
+            List<OrderProductResponseDto> orderProductResponseDtos = order.getOrderProducts().stream()
+                    .map(op -> new OrderProductResponseDto(op.getProductId(), op.getQuantity()))
+                    .collect(Collectors.toList());
+            return new OrderResponseDto(order.getId(), order.getUserId(), order.getStatus(), order.getCreatedAt(), order.getModifiedAt(), orderProductResponseDtos);
+        }).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public Order getOrderById(Long userId, Long orderId) {
-        Optional<Order> orderOptional = orderRepository.findByIdAndUserId(orderId, userId);
-        return orderOptional.orElse(null);
+    public OrderResponseDto getOrderById(Long userId, Long orderId) {
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        List<OrderProductResponseDto> orderProductResponseDtos = order.getOrderProducts().stream()
+                .map(op -> new OrderProductResponseDto(op.getProductId(), op.getQuantity()))
+                .collect(Collectors.toList());
+
+        return new OrderResponseDto(order.getId(), order.getUserId(), order.getStatus(), order.getCreatedAt(), order.getModifiedAt(), orderProductResponseDtos);
     }
 
     @Transactional
