@@ -1,7 +1,5 @@
-FROM openjdk:17-jdk-slim
-
-WORKDIR /app
-
-COPY build/libs/*.jar /app/myapp.jar
-
-ENTRYPOINT ["java", "-jar", "/app/myapp.jar"]
+FROM openjdk:17-alpine
+EXPOSE 8080
+ARG JAR_FILE
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app.jar"]
