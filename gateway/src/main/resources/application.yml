@@ -1,0 +1,41 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  application:
+    name: api-gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: user
+          uri: http://localhost:8081/
+          predicates:
+            - Path=api/users/join, api/users/login
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Authorization
+
+        - id: user
+          uri: http://localhost:8081/
+          predicates:
+            - Path=/api/users/**
+
+        - id: product
+          uri: http://localhost:8082/
+          predicates:
+            - Path=/api/products/**
+
+        - id: order
+          uri: http://localhost:8083/
+          predicates:
+            - Path=/api/orders/**
+
+jwt:
+  secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
