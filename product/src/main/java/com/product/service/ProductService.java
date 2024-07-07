@@ -47,4 +47,10 @@ public class ProductService {
 
         return productRepository.save(product);
     }
+
+    public Integer getRemainingQuantity(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
+        return product.getQuantity();
+    }
 }

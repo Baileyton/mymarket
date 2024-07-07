@@ -47,12 +47,8 @@ public class UserService {
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
     public User getDetail(long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new IllegalArgumentException("회원을 조회 할 수 없습니다.");
-        }
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 조회 할 수 없습니다."));
     }
 
     @Transactional

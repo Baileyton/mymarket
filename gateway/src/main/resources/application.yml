@@ -13,6 +13,13 @@ spring:
     name: api-gateway-service
   cloud:
     gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway Global Filter
+            preLogger: true
+            postLogger: true
+
       routes:
         - id: user
           uri: http://localhost:8081/
@@ -36,6 +43,11 @@ spring:
           uri: http://localhost:8083/
           predicates:
             - Path=/api/orders/**
+
+        - id: payment
+          uri: http://localhost:8084/
+          predicates:
+            - Path=/api/payments/**
 
 jwt:
   secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==

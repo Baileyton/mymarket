@@ -35,4 +35,11 @@ public class ProductController {
         Product createdProduct = productService.createProduct(requestDto);
         return ResponseEntity.ok(createdProduct);
     }
+
+
+    @GetMapping("/{productId}/quantity")
+    public ResponseEntity<Integer> getRemainingQuantity(@PathVariable Long productId) {
+        Integer remainingQuantity = productService.getRemainingQuantity(productId);
+        return ResponseEntity.ok(remainingQuantity);
+    }
 }
