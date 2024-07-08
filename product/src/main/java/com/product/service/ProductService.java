@@ -5,6 +5,7 @@ import com.product.dto.ProductResponseDto;
 import com.product.entity.Product;
 import com.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductService {
 
+    private static final String PRODUCT_QUANTITY_KEY_PREFIX = "product:quantity:";
+
     private final ProductRepository productRepository;
+
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Transactional(readOnly = true)
     public List<ProductResponseDto> getProducts() {
@@ -28,7 +33,7 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+
     public Optional<Product> getProductById(Long id) {
         return productRepository.findById(id);
     }
@@ -45,12 +50,29 @@ public class ProductService {
                 .modified_at(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
 
+        // Redis에 재고 수량 저장
+        redisTemplate.opsForValue().set(PRODUCT_QUANTITY_KEY_PREFIX + product.getId(), product.getQuantity());
+
         return productRepository.save(product);
     }
 
-    public Integer getRemainingQuantity(Long productId) {
+    public Integer getProductQuantity(Long productId) {
+        Integer quantity = (Integer) redisTemplate.opsForValue().get(PRODUCT_QUANTITY_KEY_PREFIX + productId);
+        if (quantity == null) {
+            Optional<Product> product = getProductById(productId);
+            quantity = product.get().getQuantity();
+            redisTemplate.opsForValue().set(PRODUCT_QUANTITY_KEY_PREFIX + productId, quantity);
+        }
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. ID: " + productId));
         return product.getQuantity();
+    }
+
+    @Transactional
+    public void updateProductQuantity(Long productId, Integer quantity) {
+        redisTemplate.opsForValue().set(PRODUCT_QUANTITY_KEY_PREFIX + productId, quantity);
+        Optional<Product> product = getProductById(productId);
+        product.updateQuantity(quantity);
+        productRepository.save(product);
     }
 }

@@ -35,8 +35,8 @@ public class User {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
-    private String created_at;
+    @Column(name="created_at",nullable = false)
+    private String createdAt;
 
     @Column
     private String modified_at;

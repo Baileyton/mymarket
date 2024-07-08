@@ -24,7 +24,7 @@ spring:
         - id: user
           uri: http://localhost:8081/
           predicates:
-            - Path=api/users/join, api/users/login
+            - Path=users/signup, users/login
             - Method=POST
           filters:
             - RemoveRequestHeader=Authorization
@@ -32,22 +32,22 @@ spring:
         - id: user
           uri: http://localhost:8081/
           predicates:
-            - Path=/api/users/**
+            - Path=/users/**
 
         - id: product
           uri: http://localhost:8082/
           predicates:
-            - Path=/api/products/**
+            - Path=/products/**
 
         - id: order
           uri: http://localhost:8083/
           predicates:
-            - Path=/api/orders/**
+            - Path=/orders/**
 
         - id: payment
           uri: http://localhost:8084/
           predicates:
-            - Path=/api/payments/**
+            - Path=/payments/**
 
 jwt:
   secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -30,7 +30,7 @@ public class UserController {
         try {
             User signupUser = userService.signUp(requestDto);
             return ResponseEntity.ok(signupUser);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) { // exception 처리 수정
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -53,8 +53,9 @@ public class UserController {
         }
     }
 
+
     @PutMapping("/update-password")
-    public ResponseEntity<String> updatePassword(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<String> updatePassword(@AuthenticationPrincipal UserDetailsImpl userDetails, // 코드 일관성
                                                  @Valid @RequestBody PasswordUpdateRequestDto requestDto) {
         userService.updatePassword(userDetails.getUser(), requestDto);
         return ResponseEntity.ok("비밀번호 변경을 성공했습니다.");
