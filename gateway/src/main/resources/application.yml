@@ -1,5 +1,5 @@
 server:
-  port: 8000
+  port: 8080
 
 eureka:
   client:
@@ -10,7 +10,7 @@ eureka:
 
 spring:
   application:
-    name: api-gateway-service
+    name: api-gateway
   cloud:
     gateway:
       default-filters:
@@ -26,8 +26,6 @@ spring:
           predicates:
             - Path=users/signup, users/login
             - Method=POST
-          filters:
-            - RemoveRequestHeader=Authorization
 
         - id: user
           uri: http://localhost:8081/
@@ -50,4 +48,5 @@ spring:
             - Path=/payments/**
 
 jwt:
-  secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+  secret: mymarket-secret-key
+  expiration: 3600000

@@ -1,10 +1,13 @@
 package com.user.service;
 
+import com.sun.jdi.request.DuplicateRequestException;
 import com.user.dto.PasswordUpdateRequestDto;
 import com.user.dto.SignupRequestDto;
 import com.user.dto.UpdateProfileRequestDto;
 import com.user.entity.User;
 import com.user.entity.UserRoleEnum;
+import com.user.exception.ErrorCode;
+import com.user.exception.UserException;
 import com.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,20 +28,15 @@ public class UserService {
     @Transactional // 메서드 수준에서 트랜잭션 적용
     public User signUp(SignupRequestDto requestDto) {
         if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 가입 되어 있는 이메일 입니다.");
+            throw new UserException(ErrorCode.EXIST_USER);
         }
-        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
-        String encodedPhone = passwordEncoder.encode(requestDto.getPhone());
-        String encodedAddress = passwordEncoder.encode(requestDto.getAddress());
 
         User user = User.builder()
                 .name(requestDto.getName())
                 .email(requestDto.getEmail())
-                .password(encodedPassword)
-                .phone(encodedPhone)
-                .address(encodedAddress)
-                .created_at(getCurrentTimestamp())
-                .modified_at(getCurrentTimestamp())
+                .password(encodeField(requestDto.getPassword()))
+                .phone(encodeField(requestDto.getPhone()))
+                .address(encodeField(requestDto.getAddress()))
                 .role(UserRoleEnum.USER) // 기본 역할 설정
                 .build();
 
@@ -48,13 +46,13 @@ public class UserService {
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
     public User getDetail(long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("회원을 조회 할 수 없습니다."));
+                .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
     }
 
     @Transactional
     public void updatePassword(User user, PasswordUpdateRequestDto requestDto) {
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 틀렸습니다.");
+            throw new UserException(ErrorCode.INCORRECT_PASSWORD);
         }
 
         String newEncodedPassword = passwordEncoder.encode(requestDto.getNewPassword());
@@ -69,7 +67,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private String getCurrentTimestamp() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    private String encodeField(String field) {
+        return passwordEncoder.encode(field);
     }
 }

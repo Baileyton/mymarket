@@ -27,35 +27,18 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequestDto requestDto) {
-        try {
-            User signupUser = userService.signUp(requestDto);
-            return ResponseEntity.ok(signupUser);
-        } catch (IllegalArgumentException e) { // exception 처리 수정
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(userService.signUp(requestDto));
     }
 
-    @GetMapping("/{userId}/detail")
-    public ResponseEntity<?> getDetail(@PathVariable("userId") long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+    @GetMapping("/detail")
+    public ResponseEntity<?> getDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         long loggedInUserId = userDetails.getUser().getId();
-
-        if (loggedInUserId != id) {
-            return ResponseEntity.status(403).body("You are not authorized to view this user's details.");
-        }
-
-        try {
-            User user = userService.getDetail(id);
-            return ResponseEntity.ok(user);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(userService.getDetail(loggedInUserId));
     }
 
 
     @PutMapping("/update-password")
-    public ResponseEntity<String> updatePassword(@AuthenticationPrincipal UserDetailsImpl userDetails, // 코드 일관성
+    public ResponseEntity<String> updatePassword(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                  @Valid @RequestBody PasswordUpdateRequestDto requestDto) {
         userService.updatePassword(userDetails.getUser(), requestDto);
         return ResponseEntity.ok("비밀번호 변경을 성공했습니다.");
@@ -68,9 +51,4 @@ public class UserController {
         return ResponseEntity.ok("주소, 휴대폰 번호 업데이트 성공했습니다.");
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // 클라이언트 측에서 JWT 토큰을 삭제하도록 요청
-        return ResponseEntity.ok("Successfully logged out");
-    }
 }

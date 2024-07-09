@@ -63,10 +63,10 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
                         .requestMatchers("/").permitAll()
-                        .requestMatchers("/api/users/login").permitAll()
-                        .requestMatchers("/api/users/signup").permitAll()
-                        .requestMatchers("/api/products").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
+                        .requestMatchers("/users/login").permitAll()
+                        .requestMatchers("/users/signup").permitAll()
+                        .requestMatchers("/products").permitAll()
+                        .requestMatchers("/products/**").permitAll()
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
