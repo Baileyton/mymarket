@@ -1,22 +1,16 @@
 package com.user.service;
 
-import com.sun.jdi.request.DuplicateRequestException;
-import com.user.dto.PasswordUpdateRequestDto;
-import com.user.dto.SignupRequestDto;
-import com.user.dto.UpdateProfileRequestDto;
+import com.user.dto.*;
 import com.user.entity.User;
 import com.user.entity.UserRoleEnum;
 import com.user.exception.ErrorCode;
 import com.user.exception.UserException;
 import com.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +35,15 @@ public class UserService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public TokenResponseDto login(LoginRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail()).orElseThrow(()-> new UserException(ErrorCode.NOT_FOUND_USER));
+
+        passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
+
+
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
