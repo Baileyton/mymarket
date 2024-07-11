@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public TokenResponseDto login(@Valid @RequestBody LoginRequestDto requestDto) {
+    public TokenResponseDto login(@RequestBody LoginRequestDto requestDto) {
         return userService.login(requestDto);
     }
 

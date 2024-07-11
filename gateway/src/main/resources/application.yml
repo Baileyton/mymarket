@@ -24,12 +24,6 @@ spring:
         - id: user
           uri: http://localhost:8081/
           predicates:
-            - Path=users/signup, users/login
-            - Method=POST
-
-        - id: user
-          uri: http://localhost:8081/
-          predicates:
             - Path=/users/**
 
         - id: product
@@ -48,5 +42,4 @@ spring:
             - Path=/payments/**
 
 jwt:
-  secret: mymarket-secret-key
-  expiration: 3600000
+  secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==

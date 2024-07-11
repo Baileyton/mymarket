@@ -6,11 +6,17 @@ import com.user.entity.UserRoleEnum;
 import com.user.exception.ErrorCode;
 import com.user.exception.UserException;
 import com.user.repository.UserRepository;
+import com.user.util.JwtTokenProvider;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +24,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate redisTemplate;
 
     @Transactional // 메서드 수준에서 트랜잭션 적용
     public User signUp(SignupRequestDto requestDto) {
@@ -39,11 +47,17 @@ public class UserService {
 
     @Transactional
     public TokenResponseDto login(LoginRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail()).orElseThrow(()-> new UserException(ErrorCode.NOT_FOUND_USER));
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
 
-        passwordEncoder.matches(requestDto.getPassword(), user.getPassword());
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            throw new UserException(ErrorCode.INCORRECT_PASSWORD);
+        }
 
+        UserRoleEnum role = user.getRole();
 
+        String token = jwtTokenProvider.createToken(requestDto.getEmail(), role);
+        return new TokenResponseDto(token);
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
