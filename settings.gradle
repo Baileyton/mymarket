@@ -1,5 +1,6 @@
 rootProject.name = 'mymarket'
 
+include 'core'
 include 'eureka'
 include 'gateway'
 include 'product'

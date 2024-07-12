@@ -3,14 +3,15 @@ server:
 
 eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultZone: http://localhost:8761/eureka
 
 spring:
   application:
-    name: api-gateway
+    name: gateway
+
   cloud:
     gateway:
       default-filters:
@@ -22,24 +23,37 @@ spring:
 
       routes:
         - id: user
-          uri: http://localhost:8081/
+          uri: lb://USER
           predicates:
-            - Path=/users/**
+            - Path=api/auth/join
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Authorization
 
-        - id: product
-          uri: http://localhost:8082/
+        - id: user
+          uri: lb://USER
           predicates:
-            - Path=/products/**
+            - Path=api/auth/login
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Authorization
+
+        - id: user
+          uri: lb://USER
+          predicates:
+            - Path=/api/auth/**
+
+        - id: user
+          uri: lb://USER
+          predicates:
+            - Path=/api/users/**
 
         - id: order
-          uri: http://localhost:8083/
+          uri: lb://ORDER
           predicates:
-            - Path=/orders/**
+            - Path=/api/items/**
 
-        - id: payment
-          uri: http://localhost:8084/
+        - id: order
+          uri: lb://ORDER
           predicates:
-            - Path=/payments/**
-
-jwt:
-  secret: 7Iqk7YyM66W07YOA7L2U65Sp7YG065+9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg==
+            - Path=/api/orders/**
