@@ -20,7 +20,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody MemberDto memberDto) {
+    public ResponseEntity<?> registerUser(@RequestBody MemberDTO memberDto) {
         try {
             // signup으로 들어오는 모든 user는 기본 회원이라는 가정으로 권한 부여
             memberDto.setRole("ROLE_USER");

@@ -31,7 +31,7 @@ public class MemberService {
         return memberRepository.findByEmail(email);
     }
 
-    public Member registerUser(MemberDto memberDto) {
+    public Member registerUser(MemberDTO memberDto) {
         if (memberDto.getEmail() == null || memberDto.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Email cannot be empty.");
         }
