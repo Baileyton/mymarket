@@ -5,6 +5,9 @@ spring:
   application:
     name: order
 
+  config:
+    import: "classpath:application-core.yml"
+
 eureka:
   client:
     register-with-eureka: true
