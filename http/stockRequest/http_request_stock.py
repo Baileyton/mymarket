@@ -32,29 +32,35 @@ def list_initial_stock():
 
 def schedule_stock_checks():
     global scheduler
-    scheduler.start()
+    try:
+        scheduler.start()
 
-    for key in redis_client.scan_iter("item:*"):
-        item_id = key.decode().split(":")[1]
-        item_info = redis_client.hgetall(key)
-        
-        if b'reservationStart' in item_info and b'reservationEnd' in item_info:
-            reservation_start_str = item_info[b'reservationStart'].decode()
-            reservation_end_str = item_info[b'reservationEnd'].decode()
-            
-            # 문자열을 datetime 객체로 변환 (시간대 변환 없이 직접 사용)
-            reservation_start = datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M:%S')
-            reservation_end = datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M:%S')
-            
-            # 예약 시작 10분 전 계산
-            start_check_time = reservation_start - timedelta(minutes=10)
+        for key in redis_client.scan_iter("item:*"):
+            item_id = key.decode().split(":")[1]
+            item_info = redis_client.hgetall(key)
 
-            # 예약 종료 시간에 대한 처리도 포함
-            end_check_time = reservation_end
+            if b'reservationStart' in item_info and b'reservationEnd' in item_info:
+                reservation_start_str = item_info[b'reservationStart'].decode()
+                reservation_end_str = item_info[b'reservationEnd'].decode()
 
-            # 스케줄러에 작업 추가 (시간대 변환 없이 직접 사용)
-            scheduler.add_job(notify_stock, 'date', run_date=start_check_time, args=["Reservation Start", item_id], misfire_grace_time=300)  # 5분의 유예 시간
-            scheduler.add_job(notify_stock, 'date', run_date=end_check_time, args=["Reservation End", item_id], misfire_grace_time=300)
+                now = datetime.now(seoul_timezone)
+                reservation_start = datetime.strptime(reservation_start_str, '%Y-%m-%dT%H:%M:%S')
+                reservation_end = datetime.strptime(reservation_end_str, '%Y-%m-%dT%H:%M:%S')
+
+                if now > reservation_end:
+                    logging.warning(f"Reservation end time has already passed for Item ID: {item_id}. Skipping scheduling.")
+                    continue
+
+                start_check_time = reservation_start - timedelta(minutes=10)
+                end_check_time = reservation_end
+
+                if now < start_check_time:
+                    scheduler.add_job(notify_stock, 'date', run_date=start_check_time, args=["Reservation Start", item_id], misfire_grace_time=300)
+
+                scheduler.add_job(notify_stock, 'date', run_date=end_check_time, args=["Reservation End", item_id], misfire_grace_time=300)
+
+    except Exception as e:
+        logging.error(f"An error occurred while scheduling stock checks: {e}")
 
 if __name__ == "__main__":
     list_initial_stock()
@@ -64,4 +70,5 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except (KeyboardInterrupt, SystemExit):
+        logging.info("Shutting down scheduler...")
         scheduler.shutdown()
