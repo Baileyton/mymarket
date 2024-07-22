@@ -7,7 +7,10 @@
 - 2024-06-19 ~ 2024-07-17 (4주간)
 
 ## 기술 스택
-- **Backend:** Spring Boot, Spring Security, JPA
+- **Framework:** Spring Boot 2.7.16
+- **Language:** Java 17
+- **Security:** Spring Security
+- **ORM:** JPA
 - **Database:** MySQL
 - **Caching:** Redis
 - **Containerization:** Docker, Docker-compose
@@ -41,7 +44,7 @@ API 명세서는 [API 명세서 링크](api-specs)에서 확인할 수 있습니
 ## 성능 최적화, 기술 결정 및 트러블 슈팅
 
 ### 성능 최적화
-- **캐싱:** Redis를 이용하여 자주 조회되는 데이터를 캐싱하여 응답 속도를 향상시켰습니다.
+- **캐싱:** 자주 조회되는 상품 상세 정보에 캐싱을 적용하여 데이터베이스 조회 빈도를 줄였고, 평균 응답 시간이 20ms에서 8ms로 약 60% 감소하였습니다. [자세히 보기](https://baileyton.tistory.com/57)
 - **비동기 처리:** 대용량 트래픽을 처리하기 위해 일부 작업을 비동기 처리하였습니다.
 
 ### 기술 결정
@@ -51,5 +54,5 @@ API 명세서는 [API 명세서 링크](api-specs)에서 확인할 수 있습니
 - **DataBase :** 높은 안정성과 성능, 광범위한 커뮤니티 지원을 통해 신뢰할 수 있는 데이터베이스 솔루션을 제공합니다. [자세히 보기](https://baileyton.tistory.com/38)
 
 ### 트러블 슈팅
-- **문제:** 
-    - **해결:** 
+- **문제:** 여러 사용자가 동시에 주문을 할 때, 재고 수량이 올바르게 감소하지 않는 문제가 발생
+    - **해결:** Pessimistic Lock을 사용하여 동시성 문제를 해결
